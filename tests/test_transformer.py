@@ -78,7 +78,8 @@ def safe_function(x, y):
     transformed, changes = transformer.transform_code(code)
     
     assert transformed is not None
-    # Safe code should have no or minimal transformations
+    # Safe code should have no transformations
+    assert len(changes) == 0
 
 
 if __name__ == '__main__':

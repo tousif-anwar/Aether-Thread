@@ -5,7 +5,7 @@ Command-line interface for Aether-Thread toolkit.
 import argparse
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from aether_thread.analyzer import ThreadSafetyAnalyzer
 from aether_thread.transformer import CodeTransformer
@@ -72,7 +72,7 @@ def analyze_file(filepath: str, verbose: bool = False) -> int:
     return 0 if summary['critical'] == 0 else 1
 
 
-def transform_file(filepath: str, output: str = None, dry_run: bool = False) -> int:
+def transform_file(filepath: str, output: Optional[str] = None, dry_run: bool = False) -> int:
     """
     Transform a Python file to add thread-safety.
     
