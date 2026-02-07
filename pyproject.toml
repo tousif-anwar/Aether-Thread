@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aether-thread"
-version = "0.1.0"
-description = "Concurrency-optimization toolkit for Python GIL-free transition"
+version = "0.2.0"
+description = "Modern thread-safe Python for the no-GIL era: @atomic decorators, contention monitoring, and more"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
 authors = [{name = "Tousif Anwar", email = "tousif@example.com"}]
-keywords = ["concurrency", "threading", "GIL", "optimization", "async", "thread-safe"]
+keywords = ["concurrency", "threading", "GIL", "optimization", "thread-safe", "decorators", "synchronization"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -22,14 +22,10 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: System :: Monitoring",
+    "Topic :: System :: Threading",
 ]
 
 dependencies = []
-
-[project.scripts]
-aether-audit = "aether_thread.audit.cli:main"
-aether-bench = "aether_thread.bench.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/tousif-anwar/Aether-Thread"
@@ -37,7 +33,10 @@ Issues = "https://github.com/tousif-anwar/Aether-Thread/issues"
 Documentation = "https://github.com/tousif-anwar/Aether-Thread#readme"
 
 [tool.setuptools]
-packages = ["aether_thread", "aether_thread.audit", "aether_thread.proxy", "aether_thread.bench"]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.black]
 line-length = 100

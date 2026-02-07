@@ -2,93 +2,145 @@
 
 All notable changes to this project are documented in this file.
 
-## [0.1.0] – 2026-02-07
+## [0.2.0] – 2026-02-07 (Phase 0.5 – Synchronization)
 
-### Phase 0.1 – Detection (Initial Release)
+### ✨ Major Features
 
 **Added:**
-- ✅ `aether-audit`: Static analysis CLI for detecting thread-safety issues
-  - AST-based pattern detection
+- ✅ `@atomic` decorator – Automatic thread-safe method synchronization
+  - Flexible lock type configuration (LOCK, RLOCK, SEMAPHORE)
+  - GIL-aware behavior (minimal overhead when GIL enabled)
+  - Reentrant locking support
+  - Optional timeout on lock acquisition
+- ✅ `@synchronized` decorator – Simplified thread-safety for common cases
+  - Sensible defaults for standard use cases
+  - Drop-in replacement for manual locking
+- ✅ Contention monitoring system
+  - Real-time lock contention tracking
+  - Identifies "hot locks" causing bottlenecks
+  - Automatic performance suggestions
+  - Detailed diagnostic reports
+- ✅ Professional `src/aether/` package structure
+- ✅ ThreadSafeSet collection (added to collections)
+- ✅ Comprehensive examples with BankAccount demo
+
+### 🏗️ Architecture Changes
+
+**Restructured to professional Python package layout:**
+```
+aether_thread/     → src/aether/
+├── decorators.py    (NEW)
+├── monitor.py       (NEW)
+├── collections/
+├── audit/
+└── benchmark/
+```
+
+**Benefits:**
+- Follows PEP 517/518 modern Python packaging standards
+- Better IDE support and type checking
+- Cleaner namespace management
+- Industry-standard structure
+
+### 📊 New Metrics & Monitoring
+
+- **ContentionMonitor** – Singleton that tracks all locks
+- **ContentionMetrics** – Per-lock statistics (acquisitions, wait times, contention rate)
+- **ContentionLevel** – Automatic severity classification
+- **ContentionStats** – Aggregate reporting and analysis
+
+### 🧪 Testing Enhancements
+
+**New test modules:**
+- `test_decorators.py` – 15+ tests for @atomic and @synchronized
+- `test_monitor.py` – 10+ tests for contention monitoring
+- Concurrent thread-safety verification tests
+- Exception handling and reentrant locking tests
+
+### 📝 Documentation
+
+**Updated/Added:**
+- Complete README with @atomic examples
+- API.md with decorator and monitor docs
+- bank_account.py example (BankAccount + transfers + monitoring)
+- QUICKREF.md for quick lookup
+
+### 🔄 Backward Compatibility
+
+- ✅ Original aether_thread package still available for imports
+- ✅ All 0.1.0 functionality preserved
+- Thread-safe collections work exactly as before
+
+---
+
+## [0.1.0] – 2026-02-07 (Phase 0.1 – Detection)
+
+### Initial Release
+
+**Added:**
+- ✅ **aether-audit** – Static analysis for thread-safety issues
+  - AST-based detection engine
   - Global variable scanning
   - Class attribute analysis
-  - Mutable object identification
-- ✅ `aether-proxy`: Thread-safe collection wrappers
-  - `ThreadSafeList` with automatic locking
-  - `ThreadSafeDict` with automatic locking
-  - `ThreadSafeWrapper` base class
-  - Dynamic GIL-aware behavior
-- ✅ `aether-bench`: Benchmarking suite
-  - `Benchmarker` for concurrent performance measurement
-  - `BenchmarkRunner` for standard benchmarks
-  - Support for GIL state detection
-- ✅ Comprehensive test suite
-  - Unit tests for audit module
-  - Unit tests for proxy module
-  - Thread-safety verification tests
-- ✅ Documentation
-  - Complete README with quick start
-  - API documentation
-  - Contributing guidelines
-  - Example demonstrations
-
-### Features
-
-- **Python 3.9-3.13 Support** – Full compatibility across Python versions
-- **Zero External Dependencies** – Pure Python implementation
-- **GIL Detection** – Automatic detection of GIL state
-- **CLI Tools** – Easy-to-use command-line interfaces
-  - `aether-audit` for code analysis
-  - `aether-bench` for performance comparison
-- **Comprehensive Documentation** – API docs, examples, and guides
-
-### Known Limitations
-
-- Phase 0.5 features not yet implemented
-  - `@thread_safe` decorator pending
-- Phase 1.0 optimizations not yet available
-  - Dynamic lock/lock-free switching not yet enabled
+  - CLI interface with JSON output
+- ✅ **aether-proxy** – Thread-safe collections
+  - ThreadSafeList wrapper
+  - ThreadSafeDict wrapper
+  - Automatic fine-grained locking
+  - GIL-aware behavior
+- ✅ **aether-bench** – Benchmarking suite
+  - Concurrent benchmarks
+  - Sequential baselines
+  - GIL state detection
+- ✅ Comprehensive test suite (18+ tests)
+- ✅ Full documentation and examples
 
 ---
 
 ## Planned Releases
 
-### [0.5.0] – Q2 2026 – Mitigation Phase
+### [0.5.0] – Q2 2026 (Phase 0.5 Enhancement)
 
-**Planned:**
-- `@thread_safe` decorator for automatic lock injection
-- Decorator configuration options
+**Planned but not yet implemented:**
+- Lock-free data structures when GIL is available
+- Performance profiling integration
 - Custom synchronization strategies
-- Enhanced pattern detection
-- Performance profiling tools
+- Enhanced static analysis patterns
 
-### [1.0.0] – Q3 2026 – Optimization Phase
+### [1.0.0] – Q3 2026 (Phase 1.0 – Optimization)
 
 **Planned:**
 - `sys._is_gil_enabled()` integration
-- Dynamic lock-free mode when GIL is enabled
-- Lock overhead reduction
-- Advanced performance optimization
+- Dynamic lock/lock-free switching
+- Advanced performance optimizations
+- Distributed locking support
 
-### [1.5.0] – Q4 2026 – Advanced Phase
+### [1.5.0] – Q4 2026+ (Phase 1.5 – Advanced)
 
 **Planned:**
 - Async/await pattern support
 - Actor model implementation
-- Distributed locking
 - Advanced concurrency patterns
+- Web dashboard for monitoring
 
 ---
 
-## Versioning
+## Version History
+
+| Version | Release | Status | Focus |
+|---------|---------|--------|-------|
+| 0.1.0 | Feb 2026 | ✅ Complete | Detection & Analysis |
+| 0.2.0 | Feb 2026 | ✅ Complete | Synchronization Decorators |
+| 0.5.0+ | Q2+ 2026 | 📋 Planned | Optimization & Advanced |
+
+---
+
+## Semantic Versioning
 
 This project follows [Semantic Versioning](https://semver.org/):
-- **Major** – Breaking changes (0.x → 1.x)
-- **Minor** – New features, backward compatible (x.1 → x.2)
-- **Patch** – Bug fixes, backward compatible (x.x.1 → x.x.2)
+- **Major** (0.x) – Significant feature releases or breaking changes
+- **Minor** (x.y) – New features, backward compatible
+- **Patch** (x.y.z) – Bug fixes and patches
 
 ---
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on contributing to Aether-Thread.
 
