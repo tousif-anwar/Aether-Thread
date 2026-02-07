@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aether-thread"
+version = "0.1.0"
+description = "Concurrency-optimization toolkit for Python GIL-free transition"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name = "Tousif Anwar", email = "tousif@example.com"}]
+keywords = ["concurrency", "threading", "GIL", "optimization", "async", "thread-safe"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Monitoring",
+]
+
+dependencies = []
+
+[project.scripts]
+aether-audit = "aether_thread.audit.cli:main"
+aether-bench = "aether_thread.bench.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/tousif-anwar/Aether-Thread"
+Issues = "https://github.com/tousif-anwar/Aether-Thread/issues"
+Documentation = "https://github.com/tousif-anwar/Aether-Thread#readme"
+
+[tool.setuptools]
+packages = ["aether_thread", "aether_thread.audit", "aether_thread.proxy", "aether_thread.bench"]
+
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311', 'py312', 'py313']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]

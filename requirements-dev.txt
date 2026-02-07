@@ -1,0 +1,19 @@
+# Requirements for Aether-Thread
+
+# Core dependencies (empty - pure Python)
+# All functionality works with standard library only
+
+# Development dependencies
+pytest>=7.0
+pytest-cov>=4.0
+black>=23.0
+isort>=5.0
+mypy>=1.0
+flake8>=5.0
+
+# Documentation
+sphinx>=5.0
+sphinx-rtd-theme>=1.0
+
+# Benchmarking
+plotly>=5.0  # Optional, for visualizing benchmark results
