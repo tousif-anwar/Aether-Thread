@@ -26,9 +26,32 @@ try:
     from .check import GILStatusChecker, get_gil_status, is_free_threaded
     from .pool import AdaptiveThreadPool, adaptive_pool
     from .profile import SaturationCliffProfiler, benchmark_function
+    from .regression import RegressionProfiler, MigrationRecommendation
     from . import cli
 except ImportError:
     # Optional imports for environments without psutil
+    pass
+
+# New in v0.3.0: Structured concurrency API
+try:
+    from .concurrent import (
+        DataParallel,
+        par_map,
+        par_filter,
+        par_reduce,
+        ParallelIterator,
+        parallel,
+        par_for_each,
+    )
+    from .safety_veto import (
+        SafeDataParallel,
+        safe_par_map,
+        SafetyVeto,
+        VetoReason,
+        report_safety_analysis,
+    )
+except ImportError:
+    # Optional imports for environments without concurrent.futures
     pass
 
 __all__ = [
@@ -42,7 +65,7 @@ __all__ = [
     "ContentionStats",
     "audit",
     "benchmark",
-    # New v0.3.0
+    # Free-threading support v0.3.0
     "GILStatusChecker",
     "get_gil_status",
     "is_free_threaded",
@@ -50,5 +73,20 @@ __all__ = [
     "adaptive_pool",
     "SaturationCliffProfiler",
     "benchmark_function",
+    "RegressionProfiler",
+    "MigrationRecommendation",
+    # Structured concurrency v0.3.0 (research-grade)
+    "DataParallel",
+    "par_map",
+    "par_filter",
+    "par_reduce",
+    "ParallelIterator",
+    "parallel",
+    "par_for_each",
+    "SafeDataParallel",
+    "safe_par_map",
+    "SafetyVeto",
+    "VetoReason",
+    "report_safety_analysis",
     "cli",
 ]
