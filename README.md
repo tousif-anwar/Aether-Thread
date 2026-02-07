@@ -173,6 +173,41 @@ slowest = stats.get_slowest_locks(limit=10)
 monitor.print_report()
 ```
 
+### 🔍 **Static Analysis with aether-audit**
+
+Prevent thread-safety bugs before they happen. Automatic detection of:
+
+- **Shared Mutable State** – Global variables, class attributes, mutable defaults
+- **Race Condition Patterns** – Check-then-act, read-modify-write operations
+- **Auto-Fix Suggestions** – @atomic decorators, ThreadSafe wrappers, explicit locks
+
+```python
+from aether.audit import audit_code, audit_directory
+
+# Quick analysis of a single file
+code = open("myfile.py").read()
+report = audit_code(code, "myfile.py")
+print(report)
+
+# Comprehensive project scan
+report = audit_directory("src/", exclude_dirs=["venv"])
+print(report)
+```
+
+**Example Detection Output:**
+
+```
+🔴 SHARED STATE ISSUES (1 found):
+  Line 4: Global variable 'counter' is mutable and accessible from multiple threads
+  → Fix: Use @atomic decorator on functions that modify 'counter'
+
+🟡 RACE CONDITIONS (2 patterns found):
+  Line 9: Compound assignment 'counter += ...' is not atomic
+  → Fix: Use @atomic decorator
+```
+
+[→ Full aether-audit documentation](docs/AUDIT.md)
+
 ### 🔍 **Static Analysis**
 
 Scan your codebase for thread-safety issues before they cause problems:
