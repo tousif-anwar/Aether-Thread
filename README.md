@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)
-![Version 0.2.0](https://img.shields.io/badge/version-0.2.0-success)
+![Version 0.3.0](https://img.shields.io/badge/version-0.3.0-success)
 
 **Modern thread-safe Python for the no-GIL era** 🚀
 
@@ -794,6 +794,182 @@ Test coverage:
 
 ---
 
+## 🟢 New in v0.3.0: Free-Threaded Python Support
+
+**Aether-Thread v0.3.0** adds comprehensive support for Python 3.13+ GIL-free execution with tools to detect, profile, and optimize free-threaded code.
+
+### 1. Free-Thread Safety Detector
+
+Detect dangerous patterns that crash or fail in free-threaded Python:
+
+```python
+from aether.audit.free_thread_detector import FreeThreadDetector
+
+detector = FreeThreadDetector("mycode.py")
+threats = detector.detect(source_code)
+
+for threat in threats:
+    if threat.crash_risk:
+        print(f"🔴 CRASH RISK: {threat.description}")
+        print(f"   Fix: {threat.recommendation}")
+```
+
+**Detects 6 threat types:**
+- 🔴 **Frame.f_locals access** (interpreter crash risk)
+- 🟠 **warnings.catch_warnings()** without sync (race condition)
+- 🔴 **Shared iterators** across threads (data loss)
+- 🟠 **async/await + threading mix** (deadlock risk)
+- 🔴 **Signal handlers modifying shared state** (critical race)
+- 🟡 **ExceptionGroup in threaded code** (consistency issues)
+
+### 2. Saturation Cliff Profiler
+
+Find the exact point where adding threads makes code **slower** (not just not faster):
+
+```python
+from aether.profile import SaturationCliffProfiler
+
+def workload():
+    # Your CPU/I/O bound work
+    for i in range(1000):
+        expensive_operation()
+
+profiler = SaturationCliffProfiler(workload, max_threads=64)
+analysis = profiler.profile()
+
+print(f"Optimal threads: {analysis.optimal_threads}")
+print(f"Cliff point: {analysis.cliff_threads} threads")
+print(analysis.plot_ascii_chart())
+```
+
+**Detects:**
+- Peak performance thread count
+- Exact cliff point (≥20% performance drop)
+- Severity of cliff (0-100% drop)
+- Recommendations for optimal settings
+
+### 3. Adaptive Thread Pool
+
+Auto-tuning thread pool that prevents saturation cliff by monitoring contention:
+
+```python
+from aether.pool import AdaptiveThreadPool
+
+with AdaptiveThreadPool(max_workers=32) as pool:
+    results = pool.map(process_item, large_dataset)
+    pool.print_status()  # Shows blocking_ratio, throughput, metrics
+```
+
+**Features:**
+- **Blocking ratio monitoring** – Detects lock contention vs I/O wait
+- **Automatic thread scaling** – Only scales when safe
+- **Real-time metrics** – Throughput, latency, CPU%, active threads
+- **Contention veto** – Prevents threads when lock contention detected
+
+### 4. GIL Status Checker
+
+Verify environment supports free-threaded Python and check package compatibility:
+
+```python
+from aether.check import GILStatusChecker
+
+checker = GILStatusChecker()
+checker.print_status()
+
+# Or programmatic access
+if checker.is_free_threaded():
+    print("✅ Running free-threaded Python!")
+```
+
+### 5. Developer CLI
+
+For command-line analysis without writing code:
+
+```bash
+# Check code for thread-safety issues
+aether check src/ --free-threaded
+
+# Profile to find saturation cliff
+aether profile benchmark.py --max-threads 64
+
+# Check GIL status
+aether status
+
+# Deep scan with all checks
+aether scan . --all
+```
+
+### 6. Jupyter Magic Commands
+
+For interactive analysis in notebooks:
+
+```python
+%load_ext aether.jupyter_magic
+
+# Then in notebook cells:
+%%audit
+# your code here
+
+%%profile_threads --max-threads 32
+def workload():
+    expensive_operation()
+
+%%free_threaded_check
+# check for free-threading issues
+
+%gil_status --full
+```
+
+### Understanding Blocking Ratio (β)
+
+The **blocking ratio** is key to auto-tuning:
+
+$$\beta = 1 - \frac{\text{CPU time}}{\text{Wall time}}$$
+
+- **β ≈ 1.0** → I/O bound (network, disk, sleep) → **Safe to scale threads**
+- **β ≈ 0.0** → CPU bound or lock contention → **Don't add more threads**
+- **β ≈ 0.3** → Contention threshold (tunable)
+
+When β < threshold, the pool detects likely contention and prevents adding threads that would only increase lock conflicts.
+
+### Example: Complete Free-Threading Migration
+
+```python
+import threading
+from aether import atomic, AdaptiveThreadPool
+from aether.audit.free_thread_detector import FreeThreadDetector
+from aether.check import is_free_threaded
+
+# 1. Verify environment
+if is_free_threaded():
+    print("✅ Running free-threaded Python")
+else:
+    print("⚠️ Standard Python - run with Python 3.13+")
+
+# 2. Check code for issues
+detector = FreeThreadDetector("myapp.py")
+threats = detector.detect(open("myapp.py").read())
+if threats:
+    for threat in threats:
+        print(f"Fix: {threat.recommendation}")
+
+# 3. Protect shared state with @atomic
+@atomic
+def update_cache(key, value):
+    cache[key] = value
+
+# 4. Use adaptive pool for workers
+with AdaptiveThreadPool(max_workers=16) as pool:
+    results = pool.map(worker_fn, work_items)
+    
+    # Check how pool adapted to contention
+    metrics = pool.get_metrics()
+    print(f"Blocking ratio: {metrics.blocking_ratio:.1%}")
+    print(f"Active threads: {metrics.active_threads}")
+```
+
+---
+
 ## Contributing
 
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
@@ -809,20 +985,37 @@ To get started:
 
 ## Roadmap & Future Work
 
-### Phase 0.5 (Mitigation)
-- `@thread_safe` decorator for automatic lock injection
-- Support for custom synchronization strategies
-- Integration with logging and monitoring
+### ✅ Phase 0.1-0.2 (Foundation) – COMPLETE
+- `@atomic` and `@synchronized` decorators
+- ThreadSafeList, ThreadSafeDict, ThreadSafeSet collections
+- ContentionMonitor for performance analysis
+- Static code auditing (aether-audit)
 
-### Phase 1.0 (Optimization)
-- Dynamic GIL detection using `sys._is_gil_enabled()`
+### ✅ Phase 0.3 (Free-Threading Support) – COMPLETE
+- FreeThreadDetector for Python 3.13+ safety issues
+- SaturationCliffProfiler to find performance cliffs
+- AdaptiveThreadPool with contention-aware auto-tuning
+- GILStatusChecker for environment validation
+- CLI interface (aether check/profile/status)
+- Jupyter magic commands for interactive analysis
+
+### Phase 0.4 (Testing & Integration) – IN PROGRESS
+- Comprehensive test suites for Phase 0.3 modules
+- Integration tests with Python 3.13+ free-threaded runtime
+- Performance benchmarks showing cliff detection
+- Documentation and tutorials
+
+### Phase 1.0 (Optimization) – PLANNED
 - Lock-free data structures when GIL is available
-- Performance profiling tools
+- Adaptive synchronization (automatically choose best strategy)
+- AsyncIO integration with thread pools
+- Memory-mapped collections for IPC
 
-### Phase 1.5+ (Advanced)
-- Async/await pattern support
+### Phase 1.5+ (Advanced) – PLANNED
 - Actor model implementation
 - Distributed lock coordination
+- Real-time performance visualization
+- AI-powered optimization recommendations
 
 ---
 
@@ -832,6 +1025,7 @@ To get started:
 - [Python 3.13 Release Notes](https://docs.python.org/3.13/whatsnew/3.13.html)
 - [Threading Best Practices](https://docs.python.org/3/library/threading.html)
 - [Concurrency Patterns](https://realpython.com/intro-to-python-threading/)
+- [Saturation Point Theory](https://en.wikipedia.org/wiki/Amdahl%27s_law)
 
 ---
 

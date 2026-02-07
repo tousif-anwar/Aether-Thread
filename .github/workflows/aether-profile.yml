@@ -1,0 +1,43 @@
+name: Performance Profile (Aether)
+
+on:
+  release:
+    types: [created, published]
+  workflow_dispatch:
+
+jobs:
+  profile:
+    name: Performance Saturation Cliff Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install aether-thread
+          pip install -r requirements.txt
+      
+      - name: Profile workload
+        run: |
+          echo "⚡ Profiling performance to find saturation cliff..."
+          if [ -f tests/benchmark.py ]; then
+            aether profile tests/benchmark.py --max-threads 64 --duration 3.0
+          else
+            echo "⚠️ No benchmark.py found, skipping performance profile"
+          fi
+      
+      - name: Generate report
+        run: |
+          echo "📊 Performance Analysis Complete"
+          echo ""
+          echo "Next steps:"
+          echo "1. Review the thread count recommendations above"
+          echo "2. Update production configuration with optimal thread count"
+          echo "3. Monitor performance after deployment"

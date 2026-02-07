@@ -1,0 +1,50 @@
+name: Thread-Safety Check (Aether)
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  aether-check:
+    name: Thread-Safety Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Aether-Thread
+        run: pip install aether-thread
+      
+      - name: Run standard thread-safety audit
+        run: |
+          echo "🔍 Running standard thread-safety audit..."
+          aether check src/ --verbose
+      
+      - name: Run free-threaded specific checks
+        run: |
+          echo "🟢 Running free-threaded Python specific checks..."
+          aether check src/ --free-threaded --verbose
+      
+      - name: Check environment
+        run: |
+          echo "📋 Checking environment compatibility..."
+          aether status
+      
+      - name: Report summary
+        if: success()
+        run: echo "✅ All thread-safety checks passed!"
+      
+      - name: Report failure
+        if: failure()
+        run: |
+          echo "❌ Thread-safety issues found!"
+          echo "Review the output above for details."
+          exit 1

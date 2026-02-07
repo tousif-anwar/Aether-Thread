@@ -1,0 +1,57 @@
+# Pre-commit hooks for Aether-Thread
+# Install with: pre-commit install
+# Run with: pre-commit run --all-files
+
+repos:
+  # Aether-Thread safety checks
+  - repo: local
+    hooks:
+      - id: aether-check
+        name: Aether Thread-Safety Check
+        entry: aether check src/ --free-threaded
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [commit]
+        verbose: false
+      
+      - id: aether-status
+        name: Aether Environment Status
+        entry: bash -c 'echo "📋 Environment Check:" && aether status'
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [push]
+        verbose: false
+
+  # Standard pre-commit checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: mixed-line-ending
+
+  # Python code formatting
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+      - id: black
+        language_version: python3.11
+
+  # Linting
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        args: [--max-line-length=100]
+
+  # Type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.0.1
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-all]
+        args: [--ignore-missing-imports]
