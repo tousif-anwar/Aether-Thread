@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aether-thread"
+version = "0.1.0"
+description = "An open-source concurrency-optimization toolkit for GIL-free Python"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Tousif Anwar", email = "tousif.anwar@example.com"}
+]
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+keywords = ["concurrency", "threading", "gil", "parallelism", "thread-safety"]
+
+dependencies = [
+    "typing-extensions>=4.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "mypy>=1.0.0",
+]
+
+[project.scripts]
+aether-thread = "aether_thread.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/tousif-anwar/Aether-Thread"
+Repository = "https://github.com/tousif-anwar/Aether-Thread"
+Issues = "https://github.com/tousif-anwar/Aether-Thread/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["aether_thread*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39', 'py310', 'py311', 'py312', 'py313']
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
